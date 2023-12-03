@@ -243,6 +243,12 @@ const addBulkEmployee = async (req, res) => {
       const data = readDataFromExcel.readFromExcel(req.file.path);
 
       if(data.length>0){
+
+        for(let i = 0;i<data.length;i++){
+          console.log(data[i].password)
+          data[i].password = encryptPassword.encryptPassword(data[i].password);
+     }
+
         const flag = await employeeModel.insertMany(data);
         if (flag) {
           res.status(200).json({

@@ -12,6 +12,10 @@ const readFromExcel =(filePath) =>{
             data.push(res);
         }) 
    }
+//    for(let i = 0;i<data.length;i++){
+//         // console.log(data[i].password)
+//         data[i].password = "wohoo"
+//    }
 //    console.log(data);
    return data;
 }
