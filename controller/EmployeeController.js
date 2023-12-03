@@ -3,6 +3,9 @@ const encryptPassword = require("../utils/PasswordEncrypt");
 const tokenUtil = require("../utils/TokenUtil")
 const authModel = require("../models/AuthModel");
 const AuthModel = require("../models/AuthModel");
+const readDataFromExcel = require("../utils/ReadDataFromExcel");
+const multer = require("multer");
+const path = require("path");
 
 // const employeeModel = require(EmployeeModel);
 
@@ -215,8 +218,51 @@ const loginEmployee = async (req,res)=>{
       })
 
     }
-
 }
+
+const storage = multer.diskStorage({
+  destination: "./uploads",
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1000000 },
+}).single("file");
+
+const addBulkEmployee = async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    } else {
+      console.log(req.file.path);
+      const data = readDataFromExcel.readFromExcel(req.file.path);
+
+      if(data.length>0){
+        const flag = await employeeModel.insertMany(data);
+        if (flag) {
+          res.status(200).json({
+            message: "success",
+            data: flag,
+          });
+        } else {
+          res.status(200).json({
+            message: "failed",
+          });
+        }
+      }
+      else{
+        res.status(200).json({
+            message:"no data found in excel file"
+        })
+      }
+    }
+  });
+};
 module.exports={
     getAllEmployees,
     addEmployee,
@@ -224,5 +270,6 @@ module.exports={
     updateEmployee,
     filterEmployee,
     getEmployeeById,
-    loginEmployee
+    loginEmployee,
+    addBulkEmployee
 }

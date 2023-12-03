@@ -22,7 +22,7 @@ const employeeSchema = new Schema({
     },
     count:{
         type:Number,
-        required:true
+        // required:true
     }
 })
 
